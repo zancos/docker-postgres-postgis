@@ -29,7 +29,7 @@ ENV PROCESSOR_COUNT 4
 #lib building packages
 #for address_standardizer
 RUN apt-get -y update && apt-get -y install \
-    build-essential postgresql-server-dev-$PG_MAJOR libxml2-dev libjson-c-dev \
+    apt-utils build-essential postgresql-server-dev-$PG_MAJOR libxml2-dev libjson-c-dev \
     cmake libboost-dev libgmp-dev libmpfr-dev libboost-thread-dev libboost-system-dev \
     libpcre3-dev pkg-config bash-completion
 
@@ -41,7 +41,7 @@ RUN tar xf /install-postgis/geos.tar.bz2 -C /install-postgis/geos --strip-compon
 RUN ./configure && make -j $PROCESSOR_COUNT && make install
 RUN ldconfig
 WORKDIR /install-postgis
-RUN test -x geosls
+RUN test -x geos
 
 WORKDIR /install-postgis/gdal
 ADD $GDAL /install-postgis/gdal.tar.gz
@@ -86,7 +86,7 @@ WORKDIR /install-postgis
 RUN ldconfig
 
 RUN apt-get -y remove \
-    build-essential postgresql-server-dev-$PG_MAJOR libxml2-dev libjson-c-dev \
+    apt-utils build-essential postgresql-server-dev-$PG_MAJOR libxml2-dev libjson-c-dev \
     cmake libboost-dev libgmp-dev libmpfr-dev libboost-thread-dev libboost-system-dev \
     libpcre3-dev pkg-config bash-completion
 RUN apt-get purge -y --auto-remove
