@@ -1,5 +1,5 @@
 FROM postgres:10
-MAINTAINER zancos<zancos@hotmail.com>
+LABEL manteiner='zancos<zancos@hotmail.com>'
 
 ###Versions
 
@@ -29,7 +29,7 @@ ENV PROCESSOR_COUNT 4
 #lib building packages
 #for address_standardizer
 RUN apt-get -y update && apt-get -y install \
-    apt-utils build-essential postgresql-server-dev-$PG_MAJOR libxml2-dev libjson-c-dev \
+    build-essential postgresql-server-dev-$PG_MAJOR libxml2-dev libjson-c-dev \
     cmake libboost-dev libgmp-dev libmpfr-dev libboost-thread-dev libboost-system-dev \
     libpcre3-dev pkg-config bash-completion
 
@@ -86,7 +86,7 @@ WORKDIR /install-postgis
 RUN ldconfig
 
 RUN apt-get -y remove \
-    apt-utils build-essential postgresql-server-dev-$PG_MAJOR libxml2-dev libjson-c-dev \
+    build-essential postgresql-server-dev-$PG_MAJOR libxml2-dev libjson-c-dev \
     cmake libboost-dev libgmp-dev libmpfr-dev libboost-thread-dev libboost-system-dev \
     libpcre3-dev pkg-config bash-completion
 RUN apt-get purge -y --auto-remove
