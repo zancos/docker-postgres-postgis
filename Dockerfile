@@ -27,7 +27,7 @@ ENV PROCESSOR_COUNT 4
 
 #postgis required packages, PG_MAJOR from parent container
 #lib building packages
-#for address_standardizer
+#for address_standardizer 
 RUN apt-get -y update && apt-get -y install \
     build-essential postgresql-server-dev-$PG_MAJOR libxml2-dev libjson-c-dev \
     cmake libboost-dev libgmp-dev libmpfr-dev libboost-thread-dev libboost-system-dev \
@@ -35,46 +35,55 @@ RUN apt-get -y update && apt-get -y install \
 
 WORKDIR /install-postgis
 
+# downloading and extracting sources 
 WORKDIR /install-postgis/geos
 ADD $GEOS /install-postgis/geos.tar.bz2
 RUN tar xf /install-postgis/geos.tar.bz2 -C /install-postgis/geos --strip-components=1
+WORKDIR /install-postgis/gdal
+ADD $GDAL /install-postgis/gdal.tar.gz
+RUN tar xf /install-postgis/gdal.tar.gz -C /install-postgis/gdal --strip-components=1
+WORKDIR /install-postgis/proj
+ADD $PROJ /install-postgis/proj.tar.gz
+RUN tar xf /install-postgis/proj.tar.gz -C /install-postgis/proj --strip-components=1
+WORKDIR /install-postgis/cgal
+ADD $CGAL /install-postgis/cgal.tar.xz
+RUN tar xf /install-postgis/cgal.tar.xz -C /install-postgis/cgal --strip-components=1
+WORKDIR /install-postgis/sfcgal
+ADD $SFCGAL /install-postgis/sfcgal.tar.gz
+RUN tar xf /install-postgis/sfcgal.tar.gz -C /install-postgis/sfcgal --strip-components=1
+WORKDIR /install-postgis/postgis
+ADD $POSTGIS /install-postgis/postgis.tar.gz
+RUN tar xf /install-postgis/postgis.tar.gz -C /install-postgis/postgis --strip-components=1
+
+# building and installing 
+WORKDIR /install-postgis/geos
 RUN ./configure && make -j $PROCESSOR_COUNT && make install
 RUN ldconfig
 WORKDIR /install-postgis
 RUN test -x geos
 
 WORKDIR /install-postgis/gdal
-ADD $GDAL /install-postgis/gdal.tar.gz
-RUN tar xf /install-postgis/gdal.tar.gz -C /install-postgis/gdal --strip-components=1
 RUN ./configure --with-geos=/usr/local/bin/geos-config && make -j $PROCESSOR_COUNT && make install
 RUN ldconfig
 WORKDIR /install-postgis
 RUN test -x gdal
 
 WORKDIR /install-postgis/proj
-ADD $PROJ /install-postgis/proj.tar.gz
-RUN tar xf /install-postgis/proj.tar.gz -C /install-postgis/proj --strip-components=1
 RUN ./configure && make -j $PROCESSOR_COUNT && make install
 WORKDIR /install-postgis
 RUN test -f /usr/local/include/proj_api.h
 
 WORKDIR /install-postgis/cgal
-ADD $CGAL /install-postgis/cgal.tar.xz
-RUN tar xf /install-postgis/cgal.tar.xz -C /install-postgis/cgal --strip-components=1
 RUN cmake . && make -j $PROCESSOR_COUNT && make install
 WORKDIR /install-postgis
 RUN test -d /usr/local/lib/CGAL
 
 WORKDIR /install-postgis/sfcgal
-ADD $SFCGAL /install-postgis/sfcgal.tar.gz
-RUN tar xf /install-postgis/sfcgal.tar.gz -C /install-postgis/sfcgal --strip-components=1
 RUN cmake . && make -j $PROCESSOR_COUNT && make install
 WORKDIR /install-postgis
 RUN test -x $sfcgal_config
 
 WORKDIR /install-postgis/postgis
-ADD $POSTGIS /install-postgis/postgis.tar.gz
-RUN tar xf /install-postgis/postgis.tar.gz -C /install-postgis/postgis --strip-components=1
 RUN ./configure --with-geosconfig=/usr/local/bin/geos-config --with-gdalconfig=/usr/local/bin/gdal-config --with-sfcgal=/usr/local/bin/sfcgal-config --with-projdir=/usr/local --with-raster --with-topology && make
 WORKDIR /install-postgis/postgis/extensions/postgis
 RUN make -j $PROCESSOR_COUNT && make install
