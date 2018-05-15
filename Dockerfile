@@ -1,4 +1,4 @@
-FROM postgres:10
+FROM postgres:9
 LABEL manteiner='zancos<zancos@hotmail.com>'
 
 ###Versions
@@ -21,7 +21,7 @@ ENV SFCGAL https://github.com/Oslandia/SFCGAL/archive/v1.3.2.tar.gz
 
 #TODO make PROCESSOR_COUNT dynamic
 #built by docker.io, so reducing to 1. increase to match build server processor count as needed
-ENV PROCESSOR_COUNT 4
+ENV PROCESSOR_COUNT 1
 
 ##Installation
 
